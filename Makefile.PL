@@ -18,6 +18,16 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
+        'File::Slurp' => 0,
+        'Text::FindIndent' => 0.08,
+        'App::EUMM::Upgrade' => 0.25,
+        'Github::Fork::Parent' => 0.24,
+        'Module::Metadata' => 0,
+
+        #github support
+        'Git::Class' => 0.06,
+        'Net::GitHub' => 0.74,
+        'Config::Tiny' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'App-RepositoryLinkPL-*' },
