@@ -1,0 +1,140 @@
+#!/usr/bin/env perl
+
+use 5.12.0;
+use warnings;
+no if $] >= 5.018, warnings => "experimental";
+
+#use lib '.';
+use App::RepositoryLinkPL;
+use App::EUMM::Upgrade 0.25; #find_repo
+use Github::Fork::Parent;
+
+my $link = shift;
+die "no repository" unless $link;
+my $in_directory = 0;
+$in_directory=1 if $link eq '.';
+
+my $me;
+my $github_token;
+my $editor;
+
+if ($in_directory) {
+  (undef, $link) = find_repo('.');
+  die "no repository found in ." unless $link;
+  $link = convert_url_to_public($link);
+} else {
+  my $gitconfig = ($^O eq 'MSWin32' ? $ENV{HOMEDRIVE}.$ENV{HOMEPATH} : $ENV{HOME}).'/.gitconfig';
+  if (-e $gitconfig) {
+    require Config::Tiny;
+    my $cfg = Config::Tiny->read($gitconfig);
+    if (exists $cfg->{github}{user} && exists $cfg->{github}{token}) {
+      $me = $cfg->{github}{user} || die "No user variable in github section in $gitconfig";
+      $github_token = $cfg->{github}{token} || die "No token variable in github section in $gitconfig";
+    } else {
+      die "No github section in $gitconfig";
+    }
+  } else {
+    die "$gitconfig does not exist";
+  }
+
+  if (exists $ENV{VISUAL} || exists $ENV{EDITOR}) {
+    $editor = $ENV{VISUAL} || $ENV{EDITOR};
+  } else {
+    if ($^O eq 'MSWin32') {
+      $editor = 'notepad';
+    } else {
+      my @editors = '/usr/bin/nano';
+      if ($ENV{TERM} eq 'xterm') {
+        @editors = ('/usr/bin/gedit', @editors);
+      }
+      foreach my $p (@editors) {
+        if (-e $p) {
+          $editor = $p;
+          last;
+        }
+      }
+    }
+    unless ($editor) {
+      die "Editor not found. Set VISUAL or EDITOR environment variables.";
+    }
+  }
+}
+
+my ($author, $repo) = Github::Fork::Parent::parse_github_links($link);
+die unless $author;
+$link = "http://github.com/$author/$repo";
+
+if ($in_directory) {
+  my $author1 = github_parent_author($link);
+  if ($author1 ne $author) {
+    die "Parent is gitpan" if $author1 eq 'gitpan';
+    say "true author: $author1";
+    $author=$author1;
+    $link = "http://github.com/$author/$repo";
+  }
+  my $res = App::RepositoryLinkPL::process_current_dir($link);
+  if (!ref($res)) {
+    die "strange result: '$res'" if $res ne 'already';
+  } else {
+    if ($res->{error}) {
+      say "Error: $res->{error}";
+    } else {
+      say "all ok";
+    }
+  }
+} else {
+  die "directory already present" if -e $repo;
+  github_clone($author, $repo) or die "Could not clone $link";
+  chdir $repo or die "Cannot chdir to $repo: $!";
+  my $res = App::RepositoryLinkPL::process_current_dir($link);
+  if (!ref($res)) {
+    die "strange result: '$res'" if $res ne 'already';
+  } else {
+    if ($res->{error}) {
+      say "Error: $res->{error}";
+      system("$editor $res->{file}");
+    } else {
+      die "No commit message" unless $res->{commit_message};
+      system("$editor $res->{file}");
+      say "commit message: $res->{commit_message}";
+
+      my $branch = `git rev-parse --abbrev-ref HEAD`;
+      chomp($branch);
+      die "HEAD received" if $branch eq 'HEAD';
+      die "no branch" unless $branch;
+      say "branch: $branch";
+
+      #say "author changed to $author from $author1" if ($author1 ne $author);
+      print "actions (c - fork and commit;  p - c&push+pull request;  w - c, wait, push+pull request;  x - exit)?"; #; cx - c and exit
+      my $answ;
+      while ($answ = <>) {
+        chomp($answ);
+        my @actions = (qw/c p w x cx/);
+        last if $answ ~~ @actions;
+      }
+      exit if ($answ eq 'x');
+      rewrite_remote($author, $repo, $me);
+      commit($res->{commit_message}, $res->{file});
+      github_fork($author, $repo, $me, $github_token);
+      exit if ($answ eq 'cx' || $answ eq 'c');
+      if ($answ eq 'w') {
+        print "press enter to continue";<>;
+      }
+      git_push();
+      sleep(1);
+      require Net::GitHub;
+      my $gh = Net::GitHub->new(
+          access_token => $github_token,
+      );
+      $gh->set_default_user_repo($author, $repo);
+      my $pull_request = $gh->pull_request;
+      my $pull = $pull_request->create_pull( {
+        "title" => "Display repository URL on MetaCPAN",
+        "body" => "",
+        "head" => "$me:$branch",
+        "base" => "$branch"
+      } );
+      say $pull->{html_url};
+    }
+  }
+}

@@ -29,6 +29,10 @@ WriteMakefile(
         'Net::GitHub' => 0.74,
         'Config::Tiny' => 0,
     },
+    'EXE_FILES' => [
+      'repositorylink-pl',
+    ],
+
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'App-RepositoryLinkPL-*' },
 );
