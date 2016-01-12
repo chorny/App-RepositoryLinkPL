@@ -61,16 +61,21 @@ if ($in_directory) {
 }
 
 my ($author, $repo) = Github::Fork::Parent::parse_github_links($link);
-die unless $author;
-$link = "http://github.com/$author/$repo";
+my $github = 0;
+if ($author) { #Github repository
+  $github = 1;
+  $link = "http://github.com/$author/$repo";
+}
 
 if ($in_directory) {
-  my $author1 = github_parent_author($link);
-  if ($author1 ne $author) {
-    die "Parent is gitpan" if $author1 eq 'gitpan';
-    say "true author: $author1";
-    $author=$author1;
-    $link = "http://github.com/$author/$repo";
+  if ($github) {
+    my $author1 = github_parent_author($link);
+    if ($author1 ne $author) {
+      die "Parent is gitpan" if $author1 eq 'gitpan';
+      say "true author: $author1";
+      $author=$author1;
+      $link = "http://github.com/$author/$repo";
+    }
   }
   my $res = App::RepositoryLinkPL::process_current_dir($link);
   if (!ref($res)) {
