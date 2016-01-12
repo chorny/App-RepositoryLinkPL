@@ -44,7 +44,7 @@ if ($in_directory) {
       $editor = 'notepad';
     } else {
       my @editors = '/usr/bin/nano';
-      if ($ENV{TERM} eq 'xterm') {
+      if ($ENV{DISPLAY}) {
         @editors = ('/usr/bin/gedit', @editors);
       }
       foreach my $p (@editors) {
