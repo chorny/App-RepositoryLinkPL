@@ -10,7 +10,7 @@ use App::EUMM::Upgrade 0.25; #find_repo
 use Github::Fork::Parent;
 
 my $link = shift;
-die "no repository" unless $link;
+die "Usage: repositorylink-pl .|github_url\n" unless $link;
 my $in_directory = 0;
 $in_directory=1 if $link eq '.';
 
@@ -88,6 +88,7 @@ if ($in_directory) {
     }
   }
 } else {
+  die "Cannot extract repository name from $link\n" unless $repo;
   die "directory already present" if -e $repo;
   github_clone($author, $repo) or die "Could not clone $link";
   chdir $repo or die "Cannot chdir to $repo: $!";
@@ -143,3 +144,72 @@ if ($in_directory) {
     }
   }
 }
+
+
+__END__
+
+=head1 NAME
+
+repositorylink-pl - add repository link to Makefile.PL/Build.PL to be published on Metacpan
+
+=head1 SYNOPSIS
+
+repositorylink-pl is a program to add repository link to Makefile.PL/Build.PL,
+so it will be published via META.*.
+It can clone repository from github, add link, do fork and pull
+request or just add link to distribution in current directory
+independently from repository type/location.
+
+  repositorylink-pl .
+
+  repositorylink-pl https://github.com/chorny/App-RepositoryLinkPL
+
+=head1 WORK MODES
+
+=head2 repositorylink-pl .
+
+When called with '.' as a first command line argument, it will only add
+repository information to Makefile.PL/Build.PL in current directory.
+If it is a github repository, it will do a search for parent of this repository
+on github in case it is a fork. Program will try to covert URL to public URL,
+please send a bug report in case it was done incorrectly.
+
+=head2 github mode
+
+When called with a link to github repository as a first command line argument,
+it will clone repository, add link. As regular expressions are used to add link,
+program calls editor (VISUAL environment variable, notepad, gedit, nano), so you
+can modify code in case it was added to incorrect place. After that program asks
+which action to do:
+
+=over
+
+=item
+
+B<p> - Commit changes to repository, do fork on github, push to fork and do a pull request,
+
+=item
+
+B<c> - only fork and commit
+
+=item
+
+B<w> - same as B<p>, but wait before doing push (in case you want to do more commits)
+
+=item
+
+B<x> - exit without doing anything
+
+=back
+
+To do any action on Github, you need to specify github login and token in .gitconfig.
+Example:
+
+  [github]
+  user = test
+  token = 1234567890123456789012345678901234567890
+
+
+=head1 AUTHOR
+
+Alexandr Ciornii, C<< <alexchorny at gmail.com> >>
