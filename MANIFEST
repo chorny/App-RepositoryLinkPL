@@ -6,6 +6,7 @@ MANIFEST			This list of files
 README
 repositorylink-pl
 t/00-load.t
+t/00-compile.t
 xt/boilerplate.t
 xt/manifest.t
 xt/pod-coverage.t

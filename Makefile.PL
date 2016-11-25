@@ -14,8 +14,9 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
-    BUILD_REQUIRES => {
+    TEST_REQUIRES => {
         'Test::More' => 0,
+        'Test::Compile' => '1.1.0',
     },
     PREREQ_PM => {
         'File::Slurp' => 0,
