@@ -171,13 +171,13 @@ independently from repository type/location.
 When called with '.' as a first command line argument, it will only add
 repository information to Makefile.PL/Build.PL in current directory.
 If it is a github repository, it will do a search for parent of this repository
-on github in case it is a fork. Program will try to covert URL to public URL,
+on github in case it is a fork. Program will try to convert URL to public URL,
 please send a bug report in case it was done incorrectly.
 
 =head2 github mode
 
 When called with a link to github repository as a first command line argument,
-it will clone repository, add link. As regular expressions are used to add link,
+it will clone repository and add link. As regular expressions are used to add link,
 program calls editor (VISUAL environment variable, notepad, gedit, nano), so you
 can modify code in case it was added to incorrect place. After that program asks
 which action to do:
@@ -186,7 +186,7 @@ which action to do:
 
 =item
 
-B<p> - Commit changes to repository, do fork on github, push to fork and do a pull request,
+B<p> - commit changes to repository, do fork on github, push to fork and do a pull request
 
 =item
 
@@ -202,7 +202,7 @@ B<x> - exit without doing anything
 
 =back
 
-To do any action on Github, you need to specify github login and token in .gitconfig.
+To do any action on Github, you need to specify github login and token (L<https://github.com/settings/tokens>) in .gitconfig.
 Example:
 
   [github]
