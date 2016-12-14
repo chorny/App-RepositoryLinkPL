@@ -17,6 +17,7 @@ $in_directory=1 if $link eq '.';
 my $me;
 my $github_token;
 my $editor;
+my $log_repositories;
 
 if ($in_directory) {
   (undef, $link) = find_repo('.');
@@ -32,6 +33,9 @@ if ($in_directory) {
       $github_token = $cfg->{github}{token} || die "No token variable in github section in $gitconfig";
     } else {
       die "No github section in $gitconfig";
+    }
+    if (exists $cfg->{'repositorylinkpl'}{'logrepositories'}) {
+      $log_repositories = $cfg->{'repositorylinkpl'}{'logrepositories'};
     }
   } else {
     die "$gitconfig does not exist";
@@ -141,6 +145,10 @@ if ($in_directory) {
         "base" => "$branch"
       } );
       say $pull->{html_url};
+      if ($log_repositories) {
+        open my $fh, '>', $log_repositories or die "Cannot open $log_repositories: $! $^E";
+        say $fh $link;
+      }
     }
   }
 }
