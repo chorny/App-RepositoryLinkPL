@@ -21,7 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
         'File::Slurp' => 0,
         'Text::FindIndent' => 0.08,
-        'App::EUMM::Upgrade' => 0.25,
+        'App::EUMM::Upgrade' => 1.0,
         'Github::Fork::Parent' => 0.24,
         'Module::Metadata' => 0,
 
