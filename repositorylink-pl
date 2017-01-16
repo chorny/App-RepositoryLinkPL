@@ -146,7 +146,7 @@ if ($in_directory) {
       } );
       say $pull->{html_url};
       if ($log_repositories) {
-        open my $fh, '>', $log_repositories or die "Cannot open $log_repositories: $! $^E";
+        open my $fh, '>>', $log_repositories or die "Cannot open $log_repositories: $! $^E";
         say $fh $link;
       }
     }
