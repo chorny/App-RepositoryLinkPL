@@ -76,10 +76,10 @@ sub process_current_dir {
           my $message = "";
           $version=1.10;
 
-          if ($mi_version >= $version) {
+          #if ($mi_version >= $version) {
             #$message = "";
-          }
-          unless ($content =~ s/(use inc::Module::Install)((?: 0\.\d+)?);/qq{$1}.' '.update_version(qq{$2},$version).';'.($message?" #$message":'');/e) {
+          #}
+          unless ($content =~ s/(use inc::Module::Install)((?: [01]\.\d+)?);/qq{$1}.' '.update_version(qq{$2},$version).';'.($message?" #$message":'');/e) {
             print "repository was not added\n";
             return ({error => "repository was not added", file => $process_file, builder => $dist_builder});
           }
