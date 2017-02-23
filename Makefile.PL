@@ -8,7 +8,7 @@ WriteMakefile(
     AUTHOR           => q{Alexandr Ciornii <alexchorny AT gmail.com>},
     VERSION_FROM     => 'lib/App/RepositoryLinkPL.pm',
     ABSTRACT_FROM    => 'lib/App/RepositoryLinkPL.pm',
-    LICENSE          => 'GPL3',
+    LICENSE          => 'GPL_3',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.012,
     CONFIGURE_REQUIRES => {
