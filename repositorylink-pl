@@ -7,7 +7,7 @@ no if $] >= 5.018, warnings => "experimental";
 #use lib '.';
 use App::RepositoryLinkPL;
 use App::EUMM::Upgrade 1.0; #find_repo
-use Github::Fork::Parent;
+use Github::Fork::Parent 1.0;
 
 my $link = shift;
 die "Usage: repositorylink-pl .|github_url\n" unless $link;

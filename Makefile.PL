@@ -22,7 +22,7 @@ WriteMakefile(
         'File::Slurp' => 0,
         'Text::FindIndent' => 0.08,
         'App::EUMM::Upgrade' => 1.0,
-        'Github::Fork::Parent' => 0.24,
+        'Github::Fork::Parent' => 1.0,
         'Module::Metadata' => 0,
 
         #github support
